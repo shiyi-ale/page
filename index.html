@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas 平行四边形计算器</title>
+</head>
+<body>
+<h1>Canvas 平行四边形计算器</h1>
+<label for="sideLength">输入平行四边形的边长AD：</label>
+<input type="number" id="sideLength" placeholder="边长">
+<label for="angle">输入一个角A的角度（度数）：</label>
+<input type="number" id="angle" placeholder="角度">
+<label for="heightInput">输入平行四边形的高AE：</label>
+<input type="number" id="heightInput" placeholder="高">
+<button onclick="calculate()">计算</button>
+<button onclick="exportAsImage()">导出为图片</button>
+
+<canvas id="myCanvas" width="1000" height="500" style="border:1px solid #000;"></canvas>
+
+<script>
+
+    function calculate() {
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        N = 1;
+        x = 1;
+        y = 1;
+
+
+        let sideLength = parseFloat(document.getElementById('sideLength').value);//边长
+        const sideLength2 = parseFloat(document.getElementById('sideLength').value);
+        const angle = parseFloat(document.getElementById('angle').value);
+        const angle1 = angle;
+        const angle2 = 90.0 - angle;
+        let height = parseFloat(document.getElementById('heightInput').value);
+        let height2 = parseFloat(document.getElementById('heightInput').value);
+        if ((sideLength > 300)||(height > 300)) {
+
+                x = sideLength / 300;
+                y = height / 300;
+                if (x > y) {
+                    N = x;
+                } else {
+                    N = y
+                }
+
+
+        }
+        // sideLength = sideLength / N;
+        // height = height / N;
+
+        const angleInRadians1 = (angle1 * Math.PI) / 180;
+        const angleInRadians2 = (angle2 * Math.PI) / 180;
+        const otherSideLength = height / Math.cos(angleInRadians2);
+
+        const heightPosition = sideLength * Math.sin(angleInRadians2);
+        const APositionX = 0;
+        const APositionY = 0;
+        const BPositionX = otherSideLength/N;
+        const BPositionY = 0;
+
+
+        const EPositionX = height * Math.cos(angleInRadians2)/N;
+        const EPositionY = -height * Math.sin(angleInRadians2)/N;
+        const DPositionX = sideLength * Math.cos(angleInRadians1)/N;
+        const DPositionY = sideLength * Math.sin(angleInRadians1)/N;
+
+        const CPositionX = DPositionX + otherSideLength/N;
+        const CPositionY = DPositionY;
+        const FC = Math.cos(angleInRadians1) * sideLength2;
+        const FB = Math.sin(angleInRadians1) * sideLength2;
+        const AB = height2 / Math.cos(angleInRadians2)
+
+
+        // 绘制平行四边形
+        ctx.beginPath();
+
+
+        const startX = 50;
+        const startY = 330;
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(startX + BPositionX, startY);
+        ctx.lineTo(startX + CPositionX, startY - CPositionY);
+        ctx.lineTo(startX + DPositionX, startY - DPositionY);
+        ctx.closePath();
+        ctx.stroke();
+
+        // 标注各个点
+        ctx.beginPath();
+        // ctx.arc(startX, startY, 3, 0, 2 * Math.PI); // A
+        ctx.fillText('A', startX + APositionX - 15, startY - APositionY - 15);
+        // ctx.arc(startX + sideLength, startY, 3, 0, 2 * Math.PI); // B
+        ctx.fillText('B', startX + BPositionX - 15, startY - BPositionY - 15);
+        ctx.fillText(`AB长度: ${AB}`, startX + BPositionX +25, startY - BPositionY );
+        // ctx.arc(startX + sideLength + otherSideLength, startY - heightPosition, 3, 0, 2 * Math.PI); // C
+        ctx.fillText('C', startX + CPositionX - 15, startY - CPositionY - 15);
+        ctx.fillText(`FC长度: ${FC}`, startX + CPositionX + 185, startY - CPositionY );
+        ctx.fillText(`FB长度: ${FB}`, startX + CPositionX + 185, startY - CPositionY+35 );
+        // ctx.arc(startX + otherSideLength, startY - heightPosition, 3, 0, 2 * Math.PI); // D
+        ctx.fillText('D', startX + DPositionX - 15, startY - DPositionY - 15);
+        ctx.fillText(`AD长度: ${sideLength2}`, startX + DPositionX/2 - 15, startY - DPositionY/2 - 15);
+        // ctx.arc(startX + otherSideLength, startY + heightPosition, 3, 0, 2 * Math.PI); // E
+        ctx.fillText('E', startX + EPositionX - 15, startY - EPositionY - 15);
+        ctx.fillText(`AE高: ${height2}`, startX + EPositionX/2 - 15, startY - EPositionY/2 +35);
+        ctx.fillText('F', startX + BPositionX - 15, startY - CPositionY - 15);
+        ctx.stroke();
+
+        // 标注角度
+        ctx.font = '10px Arial';
+        ctx.fillStyle = 'black';
+        ctx.fillText(`角: ${angle}°`, startX + 50, startY - 20);
+        ctx.setLineDash([5, 5]);
+        //E
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(startX + EPositionX, startY - EPositionY);
+        ctx.lineTo(startX + BPositionX, startY);
+
+        ctx.stroke();
+        // 绘制内部高线
+        ctx.beginPath();
+        ctx.moveTo(startX + BPositionX, startY);
+        ctx.lineTo(startX + BPositionX, startY - CPositionY);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+//E边连
+//         ctx.beginPath();
+//         ctx.moveTo(startX + EPositionX, startY -EPositionY);
+//         ctx.lineTo(startX + BPositionX, startY -BPositionY);
+//         ctx.closePath();
+//         ctx.stroke();
+
+        // 显示另一边的长度
+        document.getElementById('result').innerText = `另一边AB长为: ${AB}\n短边FC为：${FC}\nFB为：${FB}`;
+
+    }
+
+    function exportAsImage() {
+        const canvas = document.getElementById('myCanvas');
+        const dataURL = canvas.toDataURL('image/png');
+
+        // 创建一个新的图片元素
+        const img = new Image();
+        img.src = dataURL;
+
+        // 将图片添加到页面中，或者进行其他操作
+        document.body.appendChild(img);
+
+        // 可以将 dataURL 上传到服务器保存为图像文件
+        // fetch('saveImage.php', {
+        //     method: 'POST',
+        //     body: JSON.stringify({ image: dataURL }),
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // }).then(response => {
+        //     // 处理服务器响应
+        // });
+    }
+</script>
+<div id="result"></div>
+</body>
+</html>
